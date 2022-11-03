@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     private static String BASE_URL="\n" +
-            "http://api.apnicare.in/";
+            "https://dev.api.apnicare.in/auth/";
     private static RetrofitClient retrofitClient;
     private static Retrofit retrofit;
     private RetrofitClient(){

@@ -2,6 +2,7 @@ package com.example.apiconnection;
 
 
 
+import com.example.apiconnection.ModelResponses.LoginResponse;
 import com.example.apiconnection.ModelResponses.RegisterResponse;
 
 import retrofit2.Call;
@@ -11,8 +12,11 @@ import retrofit2.http.POST;
 
 public interface Api {
     @FormUrlEncoded
-    @POST("auth/otp_login")
+    @POST("otp_login")
     Call<RegisterResponse> register(@Field("phone") String phone);
 
+    @FormUrlEncoded
+    @POST("verify")
+    Call<LoginResponse> login(@Field("phone") String phone,@Field("otp") int otp);
 
 }

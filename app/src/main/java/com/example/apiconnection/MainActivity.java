@@ -2,6 +2,7 @@ package com.example.apiconnection;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PatternMatcher;
 import android.util.Patterns;
@@ -39,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
         if(number.isEmpty()){
             num.requestFocus();
             num.setError("please enter number");
+            Toast.makeText(MainActivity.this,"enter correct number",Toast.LENGTH_SHORT).show();
             return;
         }
         if(!Patterns.PHONE.matcher(number).matches()){
             num.requestFocus();
             num.setError("please enter a valid number");
+            Toast.makeText(MainActivity.this,"enter correct number",Toast.LENGTH_SHORT).show();
             return;
         }
         Call<RegisterResponse> call= RetrofitClient
@@ -55,13 +58,16 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                 RegisterResponse registerResponse=response.body();
                 if(response.isSuccessful()){
-                    Toast.makeText(MainActivity.this,registerResponse.getMessage(),Toast.LENGTH_SHORT).show();
+
+                    Toast.makeText(MainActivity.this,"login succes",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                    startActivity(intent);
                 }
             }
 
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
     }
