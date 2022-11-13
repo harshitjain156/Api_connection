@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.apiconnection.ModelResponses.RegisterResponse;
+import com.example.apiconnection.ModelResponses.Search.SearchResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -20,6 +21,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     EditText num;
     Button btn;
+    SharedPrefManager sharedPrefManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         num=findViewById(R.id.editTextPhone);
         btn=findViewById(R.id.button);
+        sharedPrefManager=new SharedPrefManager(getApplicationContext());
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,14 +64,28 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(MainActivity.this,"login succes",Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                    intent.putExtra("Phone", number);
                     startActivity(intent);
                 }
             }
 
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
-//                Toast.makeText(MainActivity.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,"errr",Toast.LENGTH_SHORT).show();
             }
         });
+    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+//        Intent intent = new Intent(MainActivity.this, .class);
+////            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+        if(sharedPrefManager.isLoggedIn()){
+            Intent intent = new Intent(MainActivity.this, search_medicine.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
     }
 }

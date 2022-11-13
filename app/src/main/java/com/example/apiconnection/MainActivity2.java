@@ -5,40 +5,66 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.apiconnection.ModelResponses.Data;
 import com.example.apiconnection.ModelResponses.LoginResponse;
+import com.example.apiconnection.ModelResponses.RegisterResponse;
+import com.example.apiconnection.ModelResponses.ResendOtp;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity2 extends AppCompatActivity {
-    EditText phn,otp;
+//    TextView rawdata;
+    TextView resend;
+    EditText phn;
+    EditText otp;
+    EditText firstname;
     Button btn2;
+    SharedPrefManager sharedPrefManager;
+    String phn_number;
+
     
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        phn=findViewById(R.id.editTextPhone2);
+//        rawdata=findViewById(R.id.rawdata);
+        resend=findViewById(R.id.resendotp);
+        Intent intent = getIntent();
+        phn_number=intent.getStringExtra("Phone");
         otp=findViewById(R.id.editTextNumberPassword);
         btn2=findViewById(R.id.button2);
+//        firstname=findViewById(R.id.first_name);
+        sharedPrefManager=new SharedPrefManager(getApplicationContext());
+
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 userLogin();
             }
         });
+        resend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                resentOtp();
+            }
+        });
     }
 
+
     private void userLogin() {
-        String number=phn.getText().toString();
+//        String first=firstname.getText().toString();
+        String number=phn_number;
         int otp1= Integer.parseInt(otp.getText().toString());
         if(number.isEmpty()){
             phn.requestFocus();
@@ -57,8 +83,15 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 LoginResponse loginResponse= response.body();
+
                 if (response.isSuccessful()){
-                    Intent intent = new Intent(MainActivity2.this, MainActivity.class);
+//                    rawdata.setText(String.format(
+//                            "%s\n %s \n",loginResponse.getData().getRefresh_token(),loginResponse.getData().getGender()
+//                    ));
+
+                    sharedPrefManager.saveUser(loginResponse.getData());
+                    Intent intent = new Intent(MainActivity2.this, search_medicine.class);
+
                     startActivity(intent);
 
                 }
@@ -71,5 +104,36 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
     }
+    private void resentOtp() {
+        String number=phn_number;
+        Call<ResendOtp> call= RetrofitClient.getInstance().getApi().resend(number);
+        call.enqueue(new Callback<ResendOtp>() {
+            @Override
+            public void onResponse(Call<ResendOtp> call, Response<ResendOtp> response) {
+                ResendOtp resendOtp=response.body();
+                if(response.isSuccessful()){
 
+                    Toast.makeText(MainActivity2.this,"OTP sended to "+number,Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResendOtp> call, Throwable t) {
+                Toast.makeText(MainActivity2.this,t.getMessage(),Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if(sharedPrefManager.isLoggedIn()){
+//            Intent intent = new Intent(MainActivity2.this, HomeActivity.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//        }
+//    }
 }
